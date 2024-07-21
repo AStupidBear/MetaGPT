@@ -46,7 +46,8 @@ class PlaywrightWrapper(BaseModel):
         async with async_playwright() as ap:
             browser_type = getattr(ap, self.browser_type)
             await self._run_precheck(browser_type)
-            browser = await browser_type.launch(**self.launch_kwargs)
+            # browser = await browser_type.launch(**self.launch_kwargs)
+            browser = await browser_type.connect_over_cdp("http://127.0.0.1:9222")
             _scrape = self._scrape
 
             if urls:
@@ -54,7 +55,8 @@ class PlaywrightWrapper(BaseModel):
             return await _scrape(browser, url)
 
     async def _scrape(self, browser, url):
-        context = await browser.new_context(**self.context_kwargs)
+        # context = await browser.new_context(**self.context_kwargs)
+        context = browser.contexts[0]
         page = await context.new_page()
         async with page:
             try:
